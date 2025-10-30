@@ -1,143 +1,142 @@
 # Cognitive Reserve in Alzheimer’s Disease: A Data-Driven Exploration
 
-Author: Michael Koo  
-Repository: CognitiveReserve
+# Cognitive Reserve in Alzheimer’s Disease: Report
+
+Author: Michael Koo  ·  Date: 2025-10-29  ·  Repository: CognitiveReserve
+
+This page is a standalone report. You can skim the findings below without opening the notebook; the code remains available for transparency.
 
 ---
 
-## Abstract
+## Executive summary (TL;DR)
 
-Cognitive reserve (CR) refers to the brain’s resilience to neuropathology. Individuals with higher CR can maintain better cognitive performance despite similar levels of brain pathology. In this project, I combine a brief literature review with an exploratory and modeling-driven analysis of an Alzheimer’s disease (AD) dataset to: (1) operationalize cognitive reserve using measurable proxies, (2) explore cohort structure and group differences, and (3) prototype predictive models that relate demographics, clinical measures, and lifestyle factors to cognition. The result is a transparent, reproducible pipeline with clean visuals designed for an applied data science portfolio.
-
-## Highlights at a glance
-
-- End-to-end, reproducible notebook: data loading, cleaning, EDA, feature engineering, modeling, and visualization
-- Interpretable visuals tailored for both technical and general audiences
-- Literature-informed framing: connects empirical analysis to cognitive reserve theory
-- Clear limitations and next steps, emphasizing scientific rigor and room for improvement
+- Goal: explore how cognitive reserve (CR) proxies—especially education—relate to cognition and Alzheimer’s disease status in an open dataset.
+- Approach: clean and explore the cohort; engineer simple CR proxies; fit interpretable baseline models; visualize relationships and diagnostics.
+- Headline patterns
+  - Cognition tends to decline with age; higher education is associated with better cognitive scores in this cohort.
+  - Education appears to buffer age-related decline (consistent with CR theory), though effects vary by specification.
+  - Pairwise correlations are generally modest; relationships are multi-factor and require modeling to tease apart.
+- Caveats: observational data; proxies for CR are imperfect; do not infer causality.
 
 ---
 
-## Visual preview
+## Data access and cohort
 
-Below are curated figures exported from the notebook. See the full analysis in `cognitive_reserve_analysis.ipynb`.
+- Source: Kaggle dataset “Alzheimer’s Disease Dataset”
+  - URL: https://www.kaggle.com/datasets/rabieelkharoua/alzheimers-disease-dataset
+  - This repository does NOT include the raw CSV. After downloading, place it at the project root as `alzheimers_disease_data.csv` (or update the path in the notebook).
+- Typical variables: age, sex, education (years/levels), cognitive assessments (e.g., MMSE), ADL/functional assessments, and diagnosis indicators.
+- Outcome focus: cognition-related measures (e.g., MMSE). Education is used as a practical proxy for cognitive reserve.
+
+---
+
+## What to look at in the figures
+
+Below are curated figures exported from the notebook with short takeaways.
 
 <p align="center">
    <img src="figures/overview.png" alt="Project overview figure" width="70%"/>
    <br/>
-   <em>Figure 1. Project overview visual exported from the notebook.</em>
+   <em>Figure 1. Study flow and components at a glance.</em>
+   <br/>
 </p>
 
 <p align="center">
    <img src="figures/eda_distributions.png" alt="Distributions of Age, MMSE, Education, Diagnosis, ADL, Functional Assessment" width="46%"/>
    <img src="figures/correlation_heatmap.png" alt="Correlation matrix across key variables with MMSE" width="46%"/>
    <br/>
-   <em>Figure 2–3. Left: Distribution of key variables (Age, MMSE, Education, Diagnosis, ADL, Functional Assessment). Right: Correlation matrix showing generally weak relationships with MMSE.</em>
+   <em>Figures 2–3. Cohort context. Left: key variable distributions. Right: modest pairwise correlations, suggesting multi-factor drivers.</em>
 </p>
 
 <p align="center">
-   <img src="figures/age_mmse_by_education.png" alt="Age vs MMSE stratified by education levels and grouped boxplots" width="46%"/>
-   <img src="figures/diagnosis_rate_by_age_education.png" alt="Diagnosis rates by age bins and education (line + heatmap)" width="46%"/>
+   <img src="figures/age_mmse_by_education.png" alt="Age vs MMSE by education levels" width="46%"/>
+   <img src="figures/diagnosis_rate_by_age_education.png" alt="Diagnosis rates by age bins and education" width="46%"/>
    <br/>
-   <em>Figure 4–5. Left: Age–MMSE patterns by education level (scatter + trend lines, plus grouped distributions). Right: Alzheimer’s diagnosis rates by age and education (line + heatmap).</em>
+   <em>Figures 4–5. Left: cognition tends to decline with age; higher education levels align with higher scores. Right: diagnosis rates rise with age and differ by education.</em>
 </p>
 
 <p align="center">
-   <img src="figures/mmse_regression_diagnostics.png" alt="Linear regression diagnostics (residuals, QQ, histogram, actual vs predicted)" width="46%"/>
-   <img src="figures/simple_slopes_age_mmse_education.png" alt="Simple slopes for Age effect on MMSE across education levels" width="46%"/>
+   <img src="figures/mmse_regression_diagnostics.png" alt="Linear regression diagnostics" width="46%"/>
+   <img src="figures/simple_slopes_age_mmse_education.png" alt="Simple slopes: Age × Education on MMSE" width="46%"/>
    <br/>
-   <em>Figure 6–7. Left: Linear regression diagnostics for the MMSE model. Right: Simple slopes visualization of Age × Education effects on MMSE.</em>
+   <em>Figures 6–7. Model sanity checks and interaction. Diagnostics are acceptable for a baseline. Simple slopes suggest education may buffer age-related decline.</em>
 </p>
-
-> Tip: To refresh figures after notebook edits, export via `jupyter nbconvert --to markdown cognitive_reserve_analysis.ipynb --output tmp_nb`, then copy preferred images from `tmp_nb_files/` to `figures/` (overwriting the files above as needed).
 
 ---
 
-## Background and motivation
+## Background (why cognitive reserve?)
 
-- Cognitive reserve (CR) is a theoretical construct explaining why some individuals show better-than-expected cognition given similar brain pathology.
-- In AD research, CR proxies include education, occupational complexity, baseline IQ, language/literacy measures, and cognitively stimulating activities.
-- Empirically, CR often moderates the relationship between pathology (or risk factors) and cognitive outcomes.
+Cognitive reserve (CR) explains why some people maintain better cognition than expected given similar brain pathology. In practice, researchers use proxies—like education, occupational complexity, or cognitively stimulating activities—to approximate CR. Here, we primarily use education for its availability and interpretability.
 
-For a quick survey of the literature informing this project, see `litReview.md`.
+References: Stern (2009); Stern et al. (2020). See `litReview.md` for a short literature survey.
 
-## Data
+---
 
-- This repository does NOT include the raw dataset to keep the repo lightweight and respect data hosting policies.
-- Download the data from Kaggle: https://www.kaggle.com/datasets/rabieelkharoua/alzheimers-disease-dataset
-- After downloading, place the CSV at the project root as `alzheimers_disease_data.csv` (or adjust the path in the notebook).
-- Typical variables include demographics (age, sex), clinical assessments (cognitive scores), and lifestyle/education factors used as CR proxies.
-- Targets/outcomes: cognition-related measures (e.g., composite scores or task-specific outcomes).
+## Methods at a glance
 
-Assumptions: Since CR is latent, this analysis uses practical proxies (e.g., years of education, occupational/lifestyle indicators) to approximate reserve; the exact choices are documented and justified inline in the notebook.
+1. Data hygiene and EDA: missingness checks, outliers, distributions, and bivariate plots.
+2. CR proxies: education-driven proxy variables; simple alternative specifications tested.
+3. Modeling: baseline linear regressions and simple tree-based variants; cross-validated metrics; diagnostics (residuals, QQ, actual vs. predicted).
+4. Interpretation: emphasize direction/magnitude patterns and robustness cues rather than over-precise estimates.
 
-## Methods
+---
 
-1. Data hygiene and exploratory analysis
-   - Missingness profiling, simple imputation strategies, and outlier checks
-   - Distributional EDA (histograms, KDEs, box/violin plots) and bivariate relationships
-   - Correlation heatmaps and pairwise diagnostics
+## Key findings (narrative)
 
-2. Cognitive reserve proxy construction
-   - Engineering CR proxy variables using education and related measures
-   - Optional scaling/normalization to align units
-   - Sensitivity checks with alternative proxy specifications
+- Age vs. cognition: a negative association emerges across specifications.
+- Education and cognition: higher education levels align with higher cognitive scores.
+- Buffering patterns: interaction views suggest education may attenuate age-related decline (consistent with CR theory), though effect sizes vary.
+- Cohort structure matters: distributions and modest correlations imply multi-factor interactions.
+- Modeling takeaway: simple, interpretable models capture broad patterns but leave room for richer structures and confounder control.
 
-3. Modeling
-   - Baseline linear/regularized regressions and/or tree-based models to predict cognition
-   - Cross-validation with robust metrics (e.g., MAE/RMSE for regression; ROC-AUC if classification)
-   - Model diagnostics and interpretability (e.g., feature importance, partial dependence)
+Please treat these as exploratory patterns specific to this dataset and preprocessing.
 
-4. Communication
-   - Clean plots designed for general audiences
-   - Clear captions and callouts that tie results back to CR theory
+---
 
-## Results (selected)
+## Limitations and considerations
 
-- Cohort structure and distributions provide context for interpreting CR proxies
-- Associations between CR proxies and cognitive outcomes are visualized and summarized
-- Prototype models reveal which features (including CR proxies) are most predictive of cognition
-- Diagnostics suggest where models generalize well and where they struggle
+- Proxies for CR are imperfect; education captures only part of the construct.
+- Observational design: confounding and selection bias are possible; results are not causal.
+- Measurement constraints: single-timepoint, limited variable granularity, and sample composition shape estimates.
+- External validity is untested here; replication across cohorts is encouraged.
 
-Refer to the notebook for exact numeric results, confidence intervals, and additional plots.
+---
 
-## Interpretation and discussion
+## What’s next
 
-- The observed patterns are consistent with CR theory: proxies like education often relate positively to cognitive outcomes and can buffer risk factors
-- Effect sizes and stability depend on variable quality, measurement error, and cohort composition
-- Causality is not implied; results are observational and exploratory
+- Broaden CR proxies (occupational complexity, bilingualism, cognitive engagement indices).
+- Longitudinal modeling for change over time and moderation effects.
+- Stronger confound control and causal designs when feasible.
+- Model interpretability extensions (e.g., partial dependence, SHAP) with careful validation.
 
-## Limitations
+---
 
-- CR is latent and multi-dimensional; proxies are imperfect
-- Potential confounders and cohort biases (selection, survival) may influence results
-- Sample size and measurement granularity constrain model complexity and generalizability
-- External validity not established; prospective validation is a natural next step
+## Appendix A — Reproduce or extend the analysis
 
-## Future work
+- Notebook: `cognitive_reserve_analysis.ipynb`
+- Data: download from Kaggle and place `alzheimers_disease_data.csv` at the repository root (or update the path in the notebook).
 
-- Expand proxy set (occupational complexity, bilingualism, cognitive engagement indices)
-- Incorporate longitudinal data to examine trajectories and CR moderation over time
-- Use causal inference or structural modeling to probe mechanisms
-- Validate findings across multiple datasets/cohorts
+Environment setup (macOS/Linux):
 
-## Reproducibility
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-- Primary analysis is in `cognitive_reserve_analysis.ipynb`
-- Data file: `alzheimers_disease_data.csv` (download separately from Kaggle; see Data section)
-- To regenerate the visual assets embedded above, export the notebook to Markdown (creates `tmp_nb.md` + `tmp_nb_files/`):
+Open the notebook:
+
+```bash
+jupyter lab  # or: jupyter notebook
+```
+
+Export visuals (optional):
 
 ```bash
 jupyter nbconvert --to markdown cognitive_reserve_analysis.ipynb --output tmp_nb
 ```
 
-- Optional: export to PDF for sharing:
-
-```bash
-jupyter nbconvert --to pdf cognitive_reserve_analysis.ipynb
-```
-
-Figures are curated in `figures/`. To refresh curated images after exporting to Markdown, copy the generated files:
+Copy curated images (optional):
 
 ```bash
 cp tmp_nb_files/tmp_nb_11_0.png figures/eda_distributions.png
@@ -148,29 +147,11 @@ cp tmp_nb_files/tmp_nb_23_0.png figures/mmse_regression_diagnostics.png
 cp tmp_nb_files/tmp_nb_34_0.png figures/simple_slopes_age_mmse_education.png
 ```
 
-## How to run
+Export to PDF (optional):
 
-1. Create and activate a virtual environment (macOS/Linux):
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
-2. Launch Jupyter and open the notebook:
-   ```bash
-   jupyter lab  # or: jupyter notebook
-   ```
-3. Run all cells to reproduce the figures and results.
-
-If you placed the CSV somewhere else, update the data loading path in the notebook accordingly.
-
-> Note: From the terminal output in this repo, `seaborn` is already installed; PDF export has also been tested via `nbconvert`.
-
-## References
-
-- Stern Y. Cognitive Reserve. Neuropsychologia. 2009.
-- Stern Y, et al. Whitepaper: Cognitive reserve, brain reserve, and brain maintenance. Nat Rev Neurol. 2020.
-- Optional additional sources: see `litReview.md`.
+```bash
+jupyter nbconvert --to pdf cognitive_reserve_analysis.ipynb
+```
 
 ---
 
